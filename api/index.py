@@ -19,7 +19,7 @@ def qr_code(data):
     img.save(img_io, 'PNG')
     img_io.seek(0)
     response = Response(img_io.getvalue(), content_type='image/png')
-    response.headers.set('Content-Disposition', 'attachment', filename='qr_code.png')
+    response.headers.set('Content-Disposition', 'attachment', filename='QR-Code.png')
     return response
 
 if __name__ == "__main__":
