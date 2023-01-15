@@ -1,26 +1,26 @@
-print("starting")
-import io
+from flask import Flask, Response
 import qrcode
-from flask import Flask, make_response
+from io import BytesIO
 
 app = Flask(__name__)
 
-@app.route("/qr/<path:url>")
-def qr_code(url):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(url)
+@app.route('/qr/<string:data>')
+def qr_code(data):
+    # génération du QR code
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=10,
+        border=5
+    )
+    qr.add_data(data)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
-
-    with io.BytesIO() as output:
-        img.save(output, format='PNG')
-        output.seek(0)
-        data = output.read()
-
-    response = make_response(data)
-    response.headers['Content-Type'] = 'image/png'
-    response.headers['Content-Disposition'] = 'attachment; filename=qr_code.png'
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    response = Response(img_io.getvalue(), content_type='image/png')
+    response.headers.set('Content-Disposition', 'attachment', filename='qr_code.png')
     return response
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
